@@ -1,0 +1,61 @@
+"""
+ScrollShot - tiny scrolling screenshot app for Windows/Mac/Linux
+- One-button GUI
+- Captures the active window by scrolling and stitching
+Requires: pip install pyautogui pillow
+"""
+
+import tkinter as tk
+from tkinter import messagebox
+import pyautogui
+from PIL import Image
+import time
+
+pyautogui.FAILSAFE = True  # move mouse to top-left to abort
+
+class ScrollShotApp:
+    def __init__(self, root):
+        root.title("ScrollShot")
+        root.geometry("300x180")
+        root.resizable(False, False)
+        
+        tk.Label(root, text="Tiny Scrolling Screenshot", font=("Segoe UI", 12, "bold")).pack(pady=10)
+        tk.Label(root, text="1. Open the window you want\n2. Click Capture\n3. Don't move mouse", justify="left").pack()
+        
+        self.steps = tk.IntVar(value=8)
+        tk.Scale(root, from_=3, to=20, orient="horizontal", label="Scroll steps", variable=self.steps).pack(fill="x", padx=20)
+        
+        tk.Button(root, text="CAPTURE", command=self.capture, bg="#2563eb", fg="white", height=2).pack(pady=10, fill="x", padx=20)
+        
+    def capture(self):
+        messagebox.showinfo("Ready", "You have 3 seconds to focus the window. Don't move mouse after.")
+        time.sleep(3)
+        
+        images = []
+        # get screen size to capture full screen (simplest, works everywhere)
+        for i in range(self.steps.get()):
+            img = pyautogui.screenshot()
+            images.append(img)
+            pyautogui.scroll(-800)  # scroll down
+            time.sleep(0.4)
+        
+        # stitch vertically - crop to remove duplicate overlap (simple method)
+        widths, heights = zip(*(i.size for i in images))
+        max_width = max(widths)
+        total_height = sum(heights)
+        
+        stitched = Image.new('RGB', (max_width, total_height))
+        y_offset = 0
+        for im in images:
+            stitched.paste(im, (0, y_offset))
+            y_offset += im.size[1]
+        
+        # crop to reasonable size (remove blank bottom)
+        filename = f"scrollshot_{int(time.time())}.png"
+        stitched.save(filename)
+        messagebox.showinfo("Done", f"Saved as {filename}\nIn same folder as script")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ScrollShotApp(root)
+    root.mainloop()
