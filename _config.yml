@@ -1,0 +1,23 @@
+# GitHub Pages Configuration for ScrollShot Web
+
+# Site metadata
+title: ScrollShot
+description: Tiny scrolling screenshot app for Windows, Mac, and Linux
+url: https://glaciercold101.github.io/ScrollShotWeb/
+repository: Glaciercold101/ScrollShotWeb
+
+# Build settings
+theme: null  # Using custom HTML, no Jekyll theme
+markdown: kramdown
+plugins:
+  - jekyll-feed
+
+# Exclude files from build
+exclude:
+  - .gitignore
+  - README.md
+  - Scrolling-screenshot-apps.document
+  - _config.yml
+
+# Permalink format
+permalink: /:title/
